@@ -2795,7 +2795,9 @@ end4:
                 IoFreeIrp(context.stripes[i].Irp);
                 context.stripes[i].Irp = NULL;
 
-                if (context.stripes[i].rewrite) {
+                if (context.stripes[i].rewrite && NT_SUCCESS(Status)) {
+                    context.stripes[i].rewrite = false;
+
                     Status = write_data_phys(c->devices[i]->devobj, c->devices[i]->fileobj, c->chunk_item->stripe[i].offset + context.stripes[i].offset,
                                              context.stripes[i].buf, (uint32_t)(read_stripes * c->chunk_item->stripe_len));
 
