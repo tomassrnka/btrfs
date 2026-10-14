@@ -4384,6 +4384,7 @@ NTSTATUS compress_inline(fcb* fcb, uint8_t* buf, unsigned int length,
                 *inline_len = length - space_left;
                 RtlCopyMemory(buf, scratch, *inline_len);
                 *compress_type = BTRFS_COMPRESS_LZO;
+                fcb->Vcb->superblock.incompat_flags |= BTRFS_FEATURE_INCOMPAT_COMPRESS_LZO;
             }
 
             break;
@@ -4404,6 +4405,7 @@ NTSTATUS compress_inline(fcb* fcb, uint8_t* buf, unsigned int length,
                 *inline_len = length - space_left;
                 RtlCopyMemory(buf, scratch, *inline_len);
                 *compress_type = BTRFS_COMPRESS_ZSTD;
+                fcb->Vcb->superblock.incompat_flags |= BTRFS_FEATURE_INCOMPAT_COMPRESS_ZSTD;
             }
 
             break;
