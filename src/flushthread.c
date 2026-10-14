@@ -24,8 +24,9 @@
 
 /* cf. __MAX_CSUM_ITEMS in Linux - it needs sizeof(struct btrfs_item) bytes free
  * so it can do a split. Linux tries to get it so a run will fit in a
- * sector, but the MAX_CSUM_ITEMS logic is wrong... */
-#define MAX_CSUM_SIZE (4096 - sizeof(struct btrfs_header) - (2 * sizeof(struct btrfs_item)))
+ * sector, but the MAX_CSUM_ITEMS logic is wrong... Like Linux, we also leave
+ * room for one more checksum, as btrfs check complains about full items. */
+#define MAX_CSUM_SIZE (4096 - sizeof(struct btrfs_header) - (2 * sizeof(struct btrfs_item)) - Vcb->csum_size)
 
 // #define DEBUG_WRITE_LOOPS
 
