@@ -606,6 +606,25 @@ static NTSTATUS __stdcall drv_flush_buffers(_In_ PDEVICE_OBJECT DeviceObject, _I
         Status = Irp->IoStatus.Status;
     }
 
+    // the flushed data can't be found after a crash until the trees pointing to it have been written
+
+    if (NT_SUCCESS(Status)) {
+        ExAcquireResourceExclusiveLite(&Vcb->tree_lock, true);
+
+        if (Vcb->need_write) {
+            Status = do_write(Vcb, Irp); // fails if an earlier commit has already forced us read-only
+
+            free_trees(Vcb);
+
+            if (!NT_SUCCESS(Status))
+                ERR("do_write returned %08lx\n", Status);
+        }
+
+        ExReleaseResourceLite(&Vcb->tree_lock);
+    }
+
+    Irp->IoStatus.Status = Status;
+
 end:
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
 
