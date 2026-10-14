@@ -4636,6 +4636,12 @@ static NTSTATUS mount_vol(_In_ PDEVICE_OBJECT DeviceObject, _In_ PIRP Irp) {
         goto exit;
     }
 
+    if (Vcb->superblock.flags & BTRFS_SUPER_FLAG_CHANGING_BG_TREE) {
+        WARN("cannot mount because a block group tree conversion was interrupted\n");
+        Status = STATUS_UNRECOGNIZED_VOLUME;
+        goto exit;
+    }
+
     if (!(Vcb->superblock.incompat_flags & BTRFS_FEATURE_INCOMPAT_METADATA_UUID)) {
         memcpy(Vcb->superblock.metadata_uuid, Vcb->superblock.fsid,
                BTRFS_UUID_SIZE);
